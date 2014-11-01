@@ -41,7 +41,9 @@ class GALoader
   # Validates a given configuration
   #
   # @param configuration [GAConfiguration] the configuration to validate
-  # @note required attributes are workspace, scheme and target
+  # @note required attribute is workspace/project
+  # @note if scheme is not specified, the same as the workspace/project will be used
+  # @note if target is not specified, '{workspace|project}Tests' will be used
   # @note the method will also make sure that the configured xctool executable can be found, or aborts otherwise 
   def self.validateConfiguration(configuration)
     if configuration.workspace.nil? 
@@ -58,15 +60,40 @@ class GALoader
       configurationMerge = GAConfiguration.new(GAConfiguration::GAConfigurationWorkspace => possibleWorkspace)
       configuration = configuration.merge(configurationMerge)
     end
+    
     if configuration.scheme.nil?
-      GALogger.log("scheme was not specified, exiting", :Error)
-      outputSampleConfiguration()
-      abort
+      configurationMerge = nil
+      
+      unless configuration.project.nil?
+        configurationMerge = GAConfiguration.new(GAConfiguration::GAConfigurationScheme => configuration.project)
+      end
+      unless configuration.workspace.nil?
+        configurationMerge = GAConfiguration.new(GAConfiguration::GAConfigurationScheme => configuration.workspace)
+      end
+      
+      if configurationMerge.nil?
+        GALogger.log("scheme was not specified, exiting", :Error)
+        outputSampleConfiguration()
+        abort
+      else
+        configuration = configuration.merge(configurationMerge)
+      end
     end
+    
     if configuration.target.nil?
-      GALogger.log("target was not specified, exiting", :Error)
-      outputSampleConfiguration()
-      abort
+      configurationMerge = nil
+      
+      unless configuration.scheme.nil?
+        configurationMerge = GAConfiguration.new(GAConfiguration::GAConfigurationTarget => configuration.scheme + 'Tests')
+      end
+      
+      if configurationMerge.nil?
+        GALogger.log("target was not specified, exiting", :Error)
+        outputSampleConfiguration()
+        abort
+      else
+        configuration = configuration.merge(configurationMerge)
+      end
     end
     
     xctoolExists = system("which #{configuration.xctool_path} > /dev/null")
