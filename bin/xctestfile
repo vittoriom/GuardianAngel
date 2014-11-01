@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+require 'ga_loader'
+require 'ga_runner'
+
+trap("INT") { exit }
+
+fileToTest = GALoader.getFileFromArgv(ARGV)
+configuration = GALoader.readConfiguration()
+
+runner = GARunner.new(configuration, fileToTest)
+runner.test()

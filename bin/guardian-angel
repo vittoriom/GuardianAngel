@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+require 'ga_loader'
+require 'guardian_angel'
+require 'ga_logger'
+
+trap("INT") { exit }
+
+configuration = GALoader.readConfiguration()
+
+watcher = GuardianAngel.new(configuration)
+watcher.buildTests()
+watcher.watch()
