@@ -42,10 +42,14 @@ class XctoolRunner
   def buildArgument()
      workspace = @configuration.workspace
      scheme = @configuration.scheme
+     project = @configuration.project
      
-     toBuild = " -workspace '" + workspace + ".xcworkspace'"
+     toBuild = ''
+     
      if workspace.nil?
        toBuild = " -project '" + project + ".xcodeproj'"
+     else  
+       toBuild = " -workspace '" + workspace + ".xcworkspace'"
      end 
      
      return toBuild

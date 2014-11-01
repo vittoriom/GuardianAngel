@@ -48,9 +48,11 @@ class GALoader
       possibleWorkspace = findWorkspace()
       
       if !possibleWorkspace
-        GALogger.log("workspace was not specified, exiting", :Error)
-        outputSampleConfiguration()
-        abort
+        if configuration.project.nil?
+          GALogger.log("workspace or project was not specified, exiting", :Error)
+          outputSampleConfiguration()
+          abort
+        end
       end
       
       configurationMerge = GAConfiguration.new(GAConfiguration::GAConfigurationWorkspace => possibleWorkspace)
