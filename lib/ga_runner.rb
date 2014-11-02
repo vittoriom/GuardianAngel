@@ -63,7 +63,8 @@ class GARunner
   def buildIfNeeded()
     if isTest()
        GALogger.log(@filename + ' is a test, building all the tests...')
-       GuardianAngel.buildWithConfiguration(@configuration)
     end
+    
+    GuardianAngel.buildWithConfiguration(@configuration)
   end
 end
