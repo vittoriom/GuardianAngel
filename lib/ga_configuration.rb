@@ -98,27 +98,13 @@ class GAConfiguration
   # @param other [GAConfiguration] another instance of GAConfiguration you want to merge
   # @note nil values will not overwrite valid values of self
   def merge(other)
-    unless other.scheme.nil?
-      @scheme = other.scheme
-    end
-    unless other.workspace.nil?
-      @workspace = other.workspace
-    end
-    unless other.target.nil?
-      @target = other.target
-    end
-    unless other.suffix.nil?
-      @suffix = other.suffix
-    end
-    unless other.reporter.nil?
-      @reporter = other.reporter
-    end
-    unless other.xctool_path.nil?
-      @xctool_path = other.xctool_path
-    end
-    unless other.project.nil?
-      @project = other.project
-    end
+    @scheme = other.scheme unless other.scheme.nil?
+    @workspace = other.workspace unless other.workspace.nil?
+    @target = other.target unless other.target.nil?
+    @suffix = other.suffix unless other.suffix.nil?
+    @reporter = other.reporter unless other.reporter.nil?
+    @xctool_path = other.xctool_path unless other.xctool_path.nil?
+    @project = other.project unless other.project.nil?
     
     return self
   end
