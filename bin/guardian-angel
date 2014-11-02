@@ -2,7 +2,6 @@
 
 require 'ga_loader'
 require 'guardian_angel'
-require 'ga_logger'
 
 trap("INT") { exit }
 

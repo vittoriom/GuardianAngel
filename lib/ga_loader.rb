@@ -30,12 +30,22 @@ class GALoader
   
   # Returns a possible workspace, in case one is not provided in the configuration
   #
-  # @note this searches only in the current directory
+  # @note this searches only in the top level directory
   def self.findWorkspace
-    workspace = value = `find . -maxdepth 1 -name '*.xcworkspace'`
+    workspace = `find . -maxdepth 1 -name '*.xcworkspace'`
     return nil if workspace.empty?
     
     return File.basename(workspace, ".*")
+  end
+  
+  # Returns a possible project, in case one is not provided in the configuration
+  #
+  # @note this searches only in the top level directory
+  def self.findProject
+    project = `find . -maxdepth 1 -name '*.xcodeproj'`
+    return nil if project.empty?
+    
+    return File.basename(project, ".*")
   end
   
   # Validates a given configuration
@@ -51,13 +61,20 @@ class GALoader
       
       if !possibleWorkspace
         if configuration.project.nil?
-          GALogger.log("workspace or project was not specified, exiting", :Error)
-          outputSampleConfiguration()
-          abort
+          possibleProject = findProject()
+          
+          if !possibleProject
+            GALogger.log("workspace or project was not specified, exiting", :Error)
+            outputSampleConfiguration()
+            abort
+          else
+            configurationMerge = GAConfiguration.new(GAConfiguration::GAConfigurationProject => possibleProject)
+          end
         end
+      else
+        configurationMerge = GAConfiguration.new(GAConfiguration::GAConfigurationWorkspace => possibleWorkspace)
       end
       
-      configurationMerge = GAConfiguration.new(GAConfiguration::GAConfigurationWorkspace => possibleWorkspace)
       configuration = configuration.merge(configurationMerge)
     end
     

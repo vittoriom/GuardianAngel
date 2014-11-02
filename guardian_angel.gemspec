@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'guardian-angel'
-  s.version     = '0.0.2'
+  s.version     = '0.0.3'
   s.homepage    = 'http://vittoriomonaco.it/guardian-angel'
   s.date        = '2014-11-01'
   s.summary     = "Guardian Angel"
