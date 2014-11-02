@@ -21,6 +21,11 @@ Installation
 
 Simply run `gem install guardian-angel` and you're set :)
 
+Requirements
+=============
+
+The only requirement is `xctool`, since it's used to selectively run the tests. You can install it via `brew install xctool` or following instructions on [the xctool GitHub page](https://github.com/facebook/xctool) 
+
 Configuration
 =============
 
