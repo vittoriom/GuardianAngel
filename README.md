@@ -1,6 +1,8 @@
 GuardianAngel
 =============
 
+[![Gem Version](https://badge.fury.io/rb/guardian-angel.svg)](http://badge.fury.io/rb/guardian-angel)
+
 A file watcher for iOS developers that runs tests only for the modified files
 
 The problem it solves
@@ -51,7 +53,7 @@ If one of the above conditions doesn't apply to you (e.g. you have more schemes 
 Available fields for the configuration are:
 
 + **workspace**: the name of the workspace you want to build (without extension). By default it's the workspace you have in the top level folder, if any.
-+ **project**: the name of the project you want to build (without extension), if you don't use workspaces. By default it's the xcodeproj you have in the top level folder, if you don't have a workspace.
++ **project**: the name of the project you want to build (without extension), if you don't use workspaces. By default it's the xcodeproj you have in the top level folder.
 + **scheme**: the name of the scheme you want to run tests for. By default it's *{workspace}*
 + **target**: the name of the tests target. By default it's *{scheme}Tests*
 + **suffix**: the suffix of your tests files. By default it's *Test*
