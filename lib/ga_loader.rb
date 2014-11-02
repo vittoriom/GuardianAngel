@@ -11,7 +11,7 @@ class GALoader
   # @note if the file is not found, it will try to build with default values instead
   # @note this also outputs the final GAConfiguration built on the console
   # (see #GAConfiguration)
-  def self.readConfiguration()
+  def self.readConfiguration(silent = false)
     configuration = GAConfiguration.new
     
     begin
@@ -19,11 +19,11 @@ class GALoader
       configurationMerge = GAConfiguration.new(jsonDictionary)
       configuration = configuration.merge(configurationMerge)
     rescue
-      GALogger.log("#{CONFIG_FILENAME} not found, using defaults", :Warning)
+      GALogger.log("#{CONFIG_FILENAME} not found or not a valid JSON, using defaults", :Warning) unless silent
     end
     
     validateConfiguration(configuration)
-    outputConfiguration(configuration)
+    outputConfiguration(configuration) unless silent
     
     return configuration
   end
@@ -32,20 +32,25 @@ class GALoader
   #
   # @note this searches only in the top level directory
   def self.findWorkspace
-    workspace = `find . -maxdepth 1 -name '*.xcworkspace'`
-    return nil if workspace.empty?
-    
-    return File.basename(workspace, ".*")
+    return findFile("xcworkspace")
   end
   
   # Returns a possible project, in case one is not provided in the configuration
   #
   # @note this searches only in the top level directory
   def self.findProject
-    project = `find . -maxdepth 1 -name '*.xcodeproj'`
-    return nil if project.empty?
+    return findFile("xcodeproj")
+  end
+  
+  # Returns the first file with the given extension
+  #
+  # @param extension [String] the file extension you want to search
+  # @return nil if no file is found, the first file with the given extension otherwise
+  def self.findFile(extension)
+    files = Dir.glob("*.#{extension}")
+    return nil if files.empty?
     
-    return File.basename(project, ".*")
+    return File.basename(files.first, ".*")
   end
   
   # Validates a given configuration
@@ -60,17 +65,17 @@ class GALoader
       possibleWorkspace = findWorkspace()
       
       if !possibleWorkspace
-        if configuration.project.nil?
+        possibleProject = configuration.project
+        if possibleProject.nil?
           possibleProject = findProject()
           
           if !possibleProject
-            GALogger.log("workspace or project was not specified, exiting", :Error)
-            outputSampleConfiguration()
-            abort
-          else
-            configurationMerge = GAConfiguration.new(GAConfiguration::GAConfigurationProject => possibleProject)
+            GALogger.log("workspace or project was not specified and cannot be found, exiting", :Error)
+            outputSampleConfiguration(eventuallyAbort = true)
           end
         end
+        
+        configurationMerge = GAConfiguration.new(GAConfiguration::GAConfigurationProject => possibleProject)
       else
         configurationMerge = GAConfiguration.new(GAConfiguration::GAConfigurationWorkspace => possibleWorkspace)
       end
@@ -79,8 +84,6 @@ class GALoader
     end
     
     if configuration.scheme.nil?
-      configurationMerge = nil
-      
       unless configuration.project.nil?
         configurationMerge = GAConfiguration.new(GAConfiguration::GAConfigurationScheme => configuration.project)
       end
@@ -88,29 +91,12 @@ class GALoader
         configurationMerge = GAConfiguration.new(GAConfiguration::GAConfigurationScheme => configuration.workspace)
       end
       
-      if configurationMerge.nil?
-        GALogger.log("scheme was not specified, exiting", :Error)
-        outputSampleConfiguration()
-        abort
-      else
-        configuration = configuration.merge(configurationMerge)
-      end
+      configuration = configuration.merge(configurationMerge)
     end
     
     if configuration.target.nil?
-      configurationMerge = nil
-      
-      unless configuration.scheme.nil?
-        configurationMerge = GAConfiguration.new(GAConfiguration::GAConfigurationTarget => configuration.scheme + 'Tests')
-      end
-      
-      if configurationMerge.nil?
-        GALogger.log("target was not specified, exiting", :Error)
-        outputSampleConfiguration()
-        abort
-      else
-        configuration = configuration.merge(configurationMerge)
-      end
+      configurationMerge = GAConfiguration.new(GAConfiguration::GAConfigurationTarget => configuration.scheme + 'Tests')      
+      configuration = configuration.merge(configurationMerge)
     end
     
     xctoolExists = system("which #{configuration.xctool_path} > /dev/null")
@@ -121,36 +107,38 @@ class GALoader
   end
   
   # Outputs a sample configuration to let the user know how to create a valid one
+  # 
+  # @param eventuallyAbort [Bool] pass true if you want to abort after printing out the sample configuration. Default is false.
   #
   # (see #GAConfiguration)
-  def self.outputSampleConfiguration()
-    GALogger.log('Sample configuration JSON: ' + GAConfiguration.sample.to_s, :Warning)
+  def self.outputSampleConfiguration(eventuallyAbort = false)
+    GALogger.log('Sample configuration JSON: ' + GAConfiguration.sample.to_s, :Warning, '')
+    if eventuallyAbort
+      abort
+    end
   end
   
   # Outputs a given configuration on the console
   # 
   # @param [GAConfiguration] the configuration you want to print
   def self.outputConfiguration(configuration)
-    puts configuration.to_s
+    GALogger.log(configuration.to_s, :Default, '')
   end
   
   # Returns a filename from a given array
   #
-  # @param argv [Array<String>] an array of strings
+  # @param files [Array<String>] an array of strings
   #
   # @note the method will take the last element of the array
   # @note the method will take only the filename if the element of the array is a file, removing the extension and the path
-  def self.getFileFromArgv(argv) 
-    fileToTest = nil
-    argv.each do|a| 
-      fileToTest = File.basename(a, ".*")
-    end
-
+  def self.getFileFromArray(files) 
+    fileToTest = files.first
+    
     if fileToTest.nil?
       GALogger.log('Failed to get file', :Error)
       abort
+    else
+      return File.basename(fileToTest, ".*")
     end
-    
-    return fileToTest
   end
 end

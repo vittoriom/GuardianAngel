@@ -20,9 +20,7 @@ class XctoolRunner
     xctool = @configuration.xctool_path
     
     building = workspace
-    if workspace.nil?
-      building = project
-    end
+    building = project if workspace.nil?
     
     GALogger.log("Building " + building + " with scheme " + scheme + "...")
     
@@ -45,7 +43,6 @@ class XctoolRunner
      project = @configuration.project
      
      toBuild = ''
-     
      if workspace.nil?
        toBuild = " -project '" + project + ".xcodeproj'"
      else  
@@ -60,10 +57,8 @@ class XctoolRunner
   # @param filename [String] the file you wish to run the tests for
   # @note This method supports both workspace- and project-based environments
   def test(filename)
-    workspace = @configuration.workspace
     scheme = @configuration.scheme
     target = @configuration.target
-    project = @configuration.project
     xctool = @configuration.xctool_path
     reporter = @configuration.reporter
     suffix = @configuration.suffix

@@ -9,9 +9,11 @@ class GALogger
   #
   # @param message [String] a string to log
   # @param type [Symbol] specifies the type of message. This can be :Error, :Warning, :Success or :Default
+  # @param padding [String] the padding to put before and after the message
+  #
   # @note depending on the message type, a different color will be used to print the message on the console
-  def self.log(message, type = :Default)
-    puts sequenceForType(type) + '### ' + message + ' ###' + sequenceForType(:Default)
+  def self.log(message, type = :Default, padding = ' ### ')
+    puts sequenceForType(type) + padding + message + padding + sequenceForType(:Default)
   end
   
   # Returns the character code to print with the right color given a message type

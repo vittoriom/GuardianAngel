@@ -10,9 +10,9 @@ class GARunner
   # @param filename [String] the name of the file you want to run the tests for
   # @note filename can also be a tests file
   def initialize(configuration, filename)
-        @configuration=configuration
-        @filename=filename
-        @runner=XctoolRunner.new(configuration)
+      @configuration=configuration
+      @filename=filename
+      @runner=XctoolRunner.new(configuration)
   end
   
   # Runs unit tests for the given filename, if a tests file exists
@@ -38,20 +38,24 @@ class GARunner
   # (see #buildIfNeeded)
   # (see #testIfAvailable)
   def test()    
-    filename = @filename
-    suffix = @configuration.suffix
-    
     buildIfNeeded()
-    if isTest()
-      filename = @filename.slice(/(?<file>.*)#{suffix}$/, "file")
-    end
-    
-    testIfAvailable(filename)
+    testIfAvailable(codeFilename())
   end
   
   # @return true if the filename is a tests file
   def isTest()
     return @filename.end_with? @configuration.suffix
+  end
+  
+  # @return [String] the code file corresponding to @filename, stripping the suffix if @filename is a test file
+  def codeFilename() 
+    suffix = @configuration.suffix
+    stripped = @filename
+    if isTest()
+      stripped = @filename.slice(/(?<file>.*)#{suffix}$/, "file")
+    end
+    
+    return stripped
   end
   
   # This method builds the tests project if the filename setup during initialization is a tests file
