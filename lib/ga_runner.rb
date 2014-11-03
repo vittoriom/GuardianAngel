@@ -1,6 +1,7 @@
 require 'ga_logger'
 require 'guardian_angel'
 require 'xctool_runner'
+require 'xcodebuild_runner'
 
 # @author Vittorio Monaco
 class GARunner
@@ -12,7 +13,7 @@ class GARunner
   def initialize(configuration, filename)
       @configuration=configuration
       @filename=filename
-      @runner=XctoolRunner.new(configuration)
+      @runner=XcodebuildRunner.new(configuration)
   end
   
   # Runs unit tests for the given filename, if a tests file exists
@@ -34,11 +35,9 @@ class GARunner
   
   # Tries to run unit tests for the filename setup during initialization
   # 
-  # @note if the filename is a tests file, this method strips the tests suffix and runs the tests for the right file instead, after having built the tests project first
-  # (see #buildIfNeeded)
   # (see #testIfAvailable)
   def test()    
-    buildIfNeeded()
+    @runner.prepareForFile(@filename)
     testIfAvailable(codeFilename())
   end
   
@@ -56,15 +55,5 @@ class GARunner
     end
     
     return stripped
-  end
-  
-  # This method builds the tests project if the filename setup during initialization is a tests file
-  # (see #isTest)
-  def buildIfNeeded()
-    if isTest()
-       GALogger.log(@filename + ' is a test, building all the tests...')
-    end
-    
-    GuardianAngel.buildWithConfiguration(@configuration)
   end
 end

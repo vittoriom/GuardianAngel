@@ -1,5 +1,6 @@
 require 'ga_logger'
 require 'xctool_runner'
+require 'xcodebuild_runner'
 
 # @author Vittorio Monaco
 class GuardianAngel
@@ -8,7 +9,7 @@ class GuardianAngel
   # @param configuration [GAConfiguration] the configuration you want to use to run the tests (see #GAConfiguration)
   def initialize(configuration)
     @configuration=configuration
-    @runner=XctoolRunner.new(configuration)
+    @runner=XcodebuildRunner.new(configuration)
   end
      
   # Convenience method to build tests in a stand-alone fashion

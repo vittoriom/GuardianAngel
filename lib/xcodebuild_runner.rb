@@ -1,7 +1,7 @@
 require 'ga_logger'
 
 # @author Vittorio Monaco
-class XctoolRunner
+class XcodebuildRunner
   # Creates a new instance given a GAConfiguration object
   #
   # @param configuration [GAConfiguration] the configuration you want to use to build and run the tests (see #GAConfiguration)
@@ -13,13 +13,12 @@ class XctoolRunner
   #
   # @param filename [String] the name of the file the caller wishes to test
   #
-  # @note since xctool needs to build the tests every time, this method just calls build
+  # @note since xcodebuild doesn't offer a way to test single files, this method doesn't do anything
   # (see #build)
   def prepareForFile(filename)
-    build()
   end
     
-  # Builds the tests target through xctool
+  # Builds (and runs) the tests target through xcodebuild
   #
   # @note This method supports both workspace- and project-based environments
   def build()
@@ -35,10 +34,16 @@ class XctoolRunner
     GALogger.log("Building " + building + " with scheme " + scheme + "...")
     
     toBuild = buildArgument()
-    system(xctool + toBuild + 
-           ' -scheme ' + scheme +
-           ' -sdk iphonesimulator' +
-           ' build-tests', out: $stdout, err: :out)
+    buildSucceeded = system("xcodebuild" + toBuild + 
+                            ' -scheme ' + scheme +
+                            ' -sdk iphonesimulator' +
+                            ' test | xcpretty -tc', out: $stdout, err: :out)
+                            
+    if buildSucceeded
+      GALogger.log('Tests are fine. Start coding :)', :Success)
+    else
+      GALogger.log('Tests failed. Fix them before you start iterating.', :Error)
+    end
   end
   
   # Returns the main argument for xctool to build the project/workspace
@@ -76,11 +81,9 @@ class XctoolRunner
     GALogger.log("Running tests for file " + filename + '...')
     
     toBuild = buildArgument()
-    system(xctool + toBuild +
+    system("xcodebuild" + toBuild +
            ' -scheme ' + scheme +
            ' -sdk iphonesimulator' +
-           ' run-tests' +
-           ' only ' + target + ':' + filename + suffix +
-           ' -reporter ' + reporter, out: $stdout, err: :out)
+           ' test | xcpretty -tc', out: $stdout, err: :out)
   end
 end
