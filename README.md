@@ -40,7 +40,7 @@ In the simplest case, you won't have to do anything. *It just works™*.
 
 ### What is the simplest case?
 
-The simplest case is when you have a workspace or a project in the **top level folder**, with the **same name as the scheme** you want to test. And **the test target is named _{scheme}Tests_**. I know, it's a lot of things to be the simplest case, right? But if you think about it, chances are yours **is** the simplest case :)
+The simplest case is when you have a workspace or a project in the **top level folder**, with the **same name as the scheme** you want to test. And **the test target is named _{scheme}Tests_**. And the **test files have a 'Test' suffix**. I know, it's a lot of things to be the simplest case, right? But if you think about it, chances are yours **is** the simplest case :)
 
 ### Ok, mine is not the simplest case, what now?
 
@@ -50,6 +50,7 @@ If one of the above conditions doesn't apply to you (e.g. you have more schemes 
 {
 	"workspace" : "MyApp",
 	"scheme" : "MyApp-Stage",
+	"suffix" : "Spec"
 	"target" : "MyApp-Tests"
 }
 ```
@@ -60,6 +61,7 @@ Available fields for the configuration are:
 + **project**: the name of the project you want to build (without extension), if you don't use workspaces. By default it's the xcodeproj you have in the top level folder.
 + **scheme**: the name of the scheme you want to run tests for. By default it's *{workspace}*
 + **target**: the name of the tests target. By default it's *{scheme}Tests*
++ **suffix**: the suffix of your tests files. By default it's *Test*
 
 You can just specify the configuration fields where the default value doesn't fit you, or you can specify the whole configuration if you want to.
 
